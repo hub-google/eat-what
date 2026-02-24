@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>午餐吃什麼？附近美食篩選器</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>🍽️ 吃什麼？</h1>
+            <p>設定搜尋半徑，幫你找到附近的美味店家</p>
+        </header>
+
+        <section class="search-section">
+            <div class="distance-control">
+                <label for="distanceRange">搜尋半徑：<span id="distanceVal">0.5</span> 公里</label>
+                <!-- Hybrid Slider: 0.1-1.0 (steps of 0.1), then 2-10 (steps of 1) -->
+                <input type="range" id="distanceRange" min="1" max="19" value="5" step="1">
+            </div>
+
+            <div class="button-group">
+                <button id="searchBtn" class="btn-primary">開始搜尋附近美食</button>
+                <button id="randomBtn" class="btn-secondary" style="display: none;">幫我抽一個！</button>
+            </div>
+            <div id="loader" class="loader"></div>
+        </section>
+
+        <!-- Results Controls (Search, Filter, Sort) -->
+        <section id="controls" class="controls-section" style="display: none;">
+            <div class="control-row">
+                <div class="search-box">
+                    <input type="text" id="keywordInput" placeholder="🔍 搜尋店名或類別...">
+                </div>
+            </div>
+            <div class="control-row secondary">
+                <div class="filter-group">
+                    <select id="categoryFilter">
+                        <option value="all">所有類別</option>
+                    </select>
+                    <select id="distFilter">
+                        <option value="all">所有距離</option>
+                        <option value="200">200m 內</option>
+                        <option value="500">500m 內</option>
+                        <option value="1000">1km 內</option>
+                    </select>
+                </div>
+                <div class="sort-group">
+                    <select id="sortBy">
+                        <option value="distance">依距離排序</option>
+                        <option value="name">依名稱排序</option>
+                        <option value="type">依類別排序</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <div id="status" class="status-msg"></div>
+
+        <section id="results" class="results-section">
+            <!-- 結果將會動態插入於此 -->
+        </section>
+    </div>
+
+    <!-- Photo Modal -->
+    <div id="photoModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div class="modal-header">
+                <h2 id="modalTitle">店家詳情</h2>
+                <p id="modalSubtitle" style="color: var(--text-muted); font-size: 0.95rem;">決策所需的關鍵資訊</p>
+            </div>
+
+            <div id="modalLoading" class="loader"></div>
+
+            <div id="photoContainer">
+                <!-- 詳情區塊 (電話、官網、距離) 與 5 張照片牆會動態插入於此 -->
+            </div>
+
+            <div class="modal-footer" style="margin-top: 1rem; border-top: 1px solid #eee; padding-top: 1.5rem;">
+                <p>⚠️ 若照片顯示不正常，代表 Google 禁止自動擷取，請點擊下方開啟完整版</p>
+                <a id="externalLink" href="#" target="_blank" class="go-btn" style="background: #495057;">開啟 Google
+                    原始搜尋結果</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
