@@ -1,0 +1,28 @@
+name: Verify eat-what FoodRadar integration
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live-integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check JavaScript syntax
+        run: |
+          node --check app.js
+          node --check foodradar-service.js
+          node --check foodradar-packed-turso.js
+          node --check foodradar-data-contract.js
+      - name: Verify published FoodRadar and eat-what connection
+        run: |
+          node tests/live-integration.cjs
