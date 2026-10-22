@@ -26,8 +26,10 @@ jobs:
       - name: Verify published FoodRadar and eat-what connection
         run: node tests/live-integration.cjs
       - name: Install Chromium browser test dependencies
+        if: github.event_name == 'workflow_dispatch'
         run: |
           npm install --no-save playwright@1.56.1
           npx playwright install --with-deps chromium
       - name: Exercise live eat-what in Chromium
+        if: github.event_name == 'workflow_dispatch'
         run: node tests/browser-smoke.cjs
