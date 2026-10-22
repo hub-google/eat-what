@@ -1,97 +1,125 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-Hant">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>吃什麼？附近美食篩選器</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f8faf6">
+  <meta name="description" content="吃什麼？搜尋 FoodRadar 收錄的 Uber Eats 餐廳、評分與菜單，幫你找到今天想吃的。">
+  <title>吃什麼？｜eat-what × FoodRadar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
 </head>
-
 <body>
-    <div class="container">
-        <header>
-            <h1>🍽️ 吃什麼？</h1>
-            <p>設定搜尋半徑，幫你找到附近的美味店家</p>
-        </header>
-
-        <section class="search-section">
-            <div class="distance-control">
-                <label for="distanceRange">搜尋半徑：<span id="distanceVal">0.5</span> 公里</label>
-                <!-- Hybrid Slider: 0.1-1.0 (steps of 0.1), then 2-10 (steps of 1) -->
-                <input type="range" id="distanceRange" min="1" max="19" value="5" step="1">
-            </div>
-
-            <div class="button-group">
-                <button id="searchBtn" class="btn-primary">開始搜尋附近美食</button>
-                <button id="randomBtn" class="btn-secondary" style="display: none;">幫我抽一個！</button>
-            </div>
-            <div id="loader" class="loader"></div>
-        </section>
-
-        <!-- Results Controls (Search, Filter, Sort) -->
-        <section id="controls" class="controls-section" style="display: none;">
-            <div class="control-row">
-                <div class="search-box">
-                    <input type="text" id="keywordInput" placeholder="🔍 搜尋店名或類別...">
-                </div>
-            </div>
-            <div class="control-row secondary">
-                <div class="filter-group">
-                    <select id="categoryFilter">
-                        <option value="all">所有類別</option>
-                    </select>
-                    <select id="distFilter">
-                        <option value="all">所有距離</option>
-                        <option value="200">200m 內</option>
-                        <option value="500">500m 內</option>
-                        <option value="1000">1km 內</option>
-                    </select>
-                </div>
-                <div class="sort-group">
-                    <select id="sortBy">
-                        <option value="distance">依距離排序</option>
-                        <option value="name">依名稱排序</option>
-                        <option value="type">依類別排序</option>
-                    </select>
-                </div>
-            </div>
-        </section>
-
-        <div id="status" class="status-msg"></div>
-
-        <section id="results" class="results-section">
-            <!-- 結果將會動態插入於此 -->
-        </section>
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="brand" href="./" aria-label="吃什麼首頁"><span class="brand-logo" aria-hidden="true">吃</span><span>eat<span class="brand-dot">.</span>what</span></a>
+      <div class="header-right">
+        <span class="source-mark"><span class="pulse" aria-hidden="true"></span> FoodRadar 資料</span>
+        <button id="refreshBtn" type="button" class="minimal-btn">重新整理</button>
+      </div>
     </div>
+  </header>
 
-    <!-- Photo Modal -->
-    <div id="photoModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <div class="modal-header">
-                <h2 id="modalTitle">店家詳情</h2>
-                <p id="modalSubtitle" style="color: var(--text-muted); font-size: 0.95rem;">決策所需的關鍵資訊</p>
-            </div>
+  <main class="shell">
+    <section class="hero" aria-labelledby="heroTitle">
+      <div class="eyebrow">FIND YOUR NEXT MEAL <span class="eyebrow-line"></span> 用真實菜單幫你選</div>
+      <h1 id="heroTitle">今天，<span>吃什麼？</span></h1>
+      <p class="hero-description">附近好吃的、評價不錯的、預算剛好的。從 FoodRadar 已收錄的 Uber Eats 餐廳中，挑出你想吃的這一餐。</p>
+      <div class="hero-actions">
+        <button type="button" id="locateBtn" class="primary-btn"><span aria-hidden="true">⌖</span> 使用我的位置</button>
+        <button type="button" id="showAllBtn" class="outline-btn">瀏覽已收錄餐廳</button>
+      </div>
+      <div class="sync-strip">
+        <span class="sync-dot" aria-hidden="true"></span>
+        <span id="dataFreshness">正在連接 FoodRadar...</span>
+      </div>
+    </section>
 
-            <div id="modalLoading" class="loader"></div>
+    <section class="toolbar" aria-labelledby="filtersTitle">
+      <div class="toolbar-top">
+        <div><h2 id="filtersTitle">找到你的那一餐</h2><p>先選擇條件，再從結果中挑選或隨機抽一家。</p></div>
+        <button type="button" id="clearBtn" class="text-btn">清除篩選</button>
+      </div>
+      <div class="filter-grid">
+        <label class="field search-field"><span>店名 / 餐廳關鍵字</span><input id="searchInput" type="search" placeholder="搜尋店名或地區..." autocomplete="off"></label>
+        <label class="field"><span>搜尋範圍</span>
+          <select id="radiusFilter">
+            <option value="0.5">500 公尺</option>
+            <option value="1" selected>1 公里</option>
+            <option value="3">3 公里</option>
+            <option value="5">5 公里</option>
+            <option value="10">10 公里</option>
+          </select>
+        </label>
+        <label class="field"><span>最低評分</span>
+          <select id="ratingFilter">
+            <option value="0">不限評分</option>
+            <option value="4">4.0 分以上</option>
+            <option value="4.3">4.3 分以上</option>
+            <option value="4.5">4.5 分以上</option>
+            <option value="4.7">4.7 分以上</option>
+          </select>
+        </label>
+        <label class="field"><span>餐點預算</span>
+          <select id="budgetFilter">
+            <option value="0">不限價格</option>
+            <option value="100">100 元內</option>
+            <option value="150">150 元內</option>
+            <option value="200">200 元內</option>
+            <option value="300">300 元內</option>
+            <option value="500">500 元內</option>
+          </select>
+        </label>
+      </div>
+      <div class="toolbar-bottom">
+        <label class="toggle-label"><input id="onlyDeals" type="checkbox"><span class="toggle-switch"></span><span>只看有實際降價餐點</span></label>
+        <label class="sort-label">排序
+          <select id="sortFilter">
+            <option value="rating">評分最高</option>
+            <option value="distance">距離最近</option>
+            <option value="reviews">評價最多</option>
+            <option value="name">名稱</option>
+          </select>
+        </label>
+      </div>
+    </section>
 
-            <div id="photoContainer">
-                <!-- 詳情區塊 (電話、官網、距離) 與 5 張照片牆會動態插入於此 -->
-            </div>
-
-            <div class="modal-footer" style="margin-top: 1rem; border-top: 1px solid #eee; padding-top: 1.5rem;">
-                <p>⚠️ 若照片顯示不正常，代表 Google 禁止自動擷取，請點擊下方開啟完整版</p>
-                <a id="externalLink" href="#" target="_blank" class="go-btn" style="background: #495057;">開啟 Google
-                    原始搜尋結果</a>
-            </div>
+    <section class="results-section" aria-labelledby="resultsTitle">
+      <div class="results-heading">
+        <div>
+          <p class="section-kicker">DISCOVER</p>
+          <h2 id="resultsTitle">已收錄餐廳 <span id="resultCount" class="result-number">—</span></h2>
+          <p id="statusDetail" class="results-hint">讀取資料中...</p>
         </div>
-    </div>
+        <button type="button" class="shuffle-btn" id="shuffleBtn" disabled><span aria-hidden="true">↝</span> 幫我抽一家</button>
+      </div>
+      <div id="statusTitle" class="notice" role="status" aria-live="polite">正在讀取 FoodRadar 店家資料...</div>
+      <div id="recommendationBanner" class="pick-banner" hidden></div>
+      <div id="results" class="card-grid" aria-live="polite"></div>
+      <div class="load-more-wrap"><button type="button" id="loadMoreBtn" class="outline-btn" hidden>載入更多餐廳</button></div>
+    </section>
+    <footer class="footer">
+      <div><strong>eat.what</strong> × <a href="https://fafagoback.github.io/FoodRadar/" target="_blank" rel="noopener noreferrer">FoodRadar</a></div>
+      <p>店家、評分及菜單來自 FoodRadar 已採集的 Uber Eats 資料，非即時營業資訊。價格為外送平台資料，不一定等同現場價。</p>
+    </footer>
+  </main>
 
-    <script src="app.js"></script>
+  <div id="modal" class="modal" hidden>
+    <div class="modal-backdrop" data-close="true"></div>
+    <section class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button type="button" id="modalClose" class="close-btn" aria-label="關閉店家資訊">×</button>
+      <div class="modal-head">
+        <p class="section-kicker">RESTAURANT DETAILS</p>
+        <h2 id="modalTitle">餐廳資訊</h2>
+        <p id="modalSub"></p>
+      </div>
+      <div id="modalBody" class="modal-body"></div>
+    </section>
+  </div>
+
+  <script src="./foodradar-data-contract.js"></script>
+  <script type="module" src="./app.js"></script>
 </body>
-
 </html>
